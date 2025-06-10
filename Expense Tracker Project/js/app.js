@@ -210,10 +210,11 @@ function getAllExpenses() {
     fetch(`https://expense-tracker-project-de1d6-default-rtdb.firebaseio.com/expenseDatas.json`)
         .then(res => res.json())
         .then((datas) => {
-            let expenseDatas = Object.entries(datas)
-            expenseList.innerHTML = ''
-            expenseDatas.forEach((expense) => {
-                expenseList.insertAdjacentHTML('beforeend', `
+            if (datas) {
+                let expenseDatas = Object.entries(datas)
+                expenseList.innerHTML = ''
+                expenseDatas.forEach((expense) => {
+                    expenseList.insertAdjacentHTML('beforeend', `
                 <tr class="itemtr">
                             <td ${expense[1].income ? `class="income"` : `class="class"`}>${expense[1].label}</td>
                             <td ${expense[1].income ? `class="income"` : `class="class"`}>${expense[1].income ? `` : `-`}${commafy(expense[1].amount)}</td>
@@ -225,7 +226,11 @@ function getAllExpenses() {
                             </td> 
                         </tr>
                 `)
-            })
+                })
+            } else {
+                expenseList.innerHTML = ''
+            }
+
         })
         .then(() => {
             expenseCalculator()
@@ -245,14 +250,17 @@ function expenseCalculator() {
     fetch(`https://expense-tracker-project-de1d6-default-rtdb.firebaseio.com/expenseDatas.json`)
         .then(res => res.json())
         .then((datas) => {
-            let expenseDatas = Object.entries(datas)
-
-            let sum = expenseDatas.reduce((accumulator, currentValue) => {
-                if (!currentValue[1].income) {
-                    currentValue[1].amount = -currentValue[1].amount
-                }
-                return accumulator + currentValue[1].amount
-            }, 0)
-            totalAmountElem.innerHTML = commafy(sum)
+            if (datas) {
+                let expenseDatas = Object.entries(datas)
+                let sum = expenseDatas.reduce((accumulator, currentValue) => {
+                    if (!currentValue[1].income) {
+                        currentValue[1].amount = -currentValue[1].amount
+                    }
+                    return accumulator + currentValue[1].amount
+                }, 0)
+                totalAmountElem.innerHTML = commafy(sum)
+            } else {
+                totalAmountElem.innerHTML = ''
+            }
         })
 }
